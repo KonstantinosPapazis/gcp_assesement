@@ -7,18 +7,20 @@ Based on the above setup please proceed with the following objectives.
 
 - Create a second vm in the same subnet as the first one and also do the necessary actions so as load balancer to target it.
 
-- Create a service account with roles compute.admin and storage.admin
+- Create a service account with roles compute.admin and storage.admin (ideally assign the roles with iteration)
 
-- VM has no public IP, we would like to provide access to the internet to VM, what actions should be done? Try to do the necessary changes in code so as vm to communicate to the outside world.
-
-- Create a bucket with versioning enabled.
+- VM has no public IP, we would like to provide access to the internet to VM, what actions should be done? Try to do the necessary changes in code so as vm to communicate with the outside world.
 
 - Try to SSH from one vm to another. Ensure that communication can be established.
 
 - Verify that load balancer is working.
 
-- Create a custom role with permissions to list only buckets.
-
-- Assign this custom role to your user.
-
 - Create a 3rd VM in the second subnet (subnet-02) and assign the service account created previously.
+
+- Create a bucket with versioning enabled.
+
+- Create a custom role (id = storage.bucketsReader) with permissions to list only buckets.
+
+- Create a new service account and assign the custom role to it. Then add the service account as member to the bucket created in previous step.
+
+- Create an iam policy with roles Storage Object Viewer (roles/storage.objectViewer) and member test.user@ma-z.com. Set this policy to the bucket created in previous step.

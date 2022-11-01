@@ -1,7 +1,7 @@
 resource "google_compute_router" "router" {
   name    = "my-router"
-  region  = var.region 
-  network = module.vpc.network_self_link 
+  region  = var.region
+  network = module.vpc.network_self_link
 
   bgp {
     asn = 64514
@@ -9,20 +9,20 @@ resource "google_compute_router" "router" {
   depends_on = [module.vpc]
 }
 
-resource "google_compute_router_nat" "nat" {
-  name                               = "my-router-nat"
-  router                             = google_compute_router.router.name
-  region                             = google_compute_router.router.region
-  nat_ip_allocate_option             = "AUTO_ONLY"
-  source_subnetwork_ip_ranges_to_nat = "LIST_OF_SUBNETWORKS"
-  subnetwork {
-    name                    =  module.vpc.subnets_names[0]
-    source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
-  }
+module "cloud-nat" {
+  source     = "terraform-google-modules/cloud-nat/google"
+  version    = "~> 1.2"
+  project_id = var.project_id
+  region     = var.region
+  router     = google_compute_router.router.name
 
-  log_config {
-    enable = false
-    filter = "ERRORS_ONLY"
-  }
-  depends_on = [google_compute_router.router]
+  #nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "LIST_OF_SUBNETWORKS"
+  subnetworks = [
+    {
+      name                     = module.vpc.subnets_names[0]
+      source_ip_ranges_to_nat  = ["ALL_IP_RANGES"]
+      secondary_ip_range_names = null
+    }
+  ]
 }
